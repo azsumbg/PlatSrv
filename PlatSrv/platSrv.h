@@ -1,0 +1,406 @@
+﻿#pragma once
+
+#ifdef PLATSRV_EXPORTS 
+#define PLATSRV_API __declspec(dllexport)
+#else
+#define PLATSRV_API __declspec(dllimport)
+#endif
+
+#include <random>
+#include <d2d1.h>
+
+#pragma comment(lib, "d2d1.lib")
+
+constexpr float scr_width{ 1000.0f };
+constexpr float scr_height{ 800.0f };
+
+constexpr float sky{ 50.0f };
+constexpr float ground{ 750.0f };
+
+constexpr D2D1_RECT_F FULL_SCREEN{ 0, 0, scr_width, scr_height };
+constexpr D2D1_RECT_F GAME_SCREEN{ 0, sky, scr_width, ground };
+
+constexpr int ERR_PTR{ 5001 };
+constexpr int ERR_INDEX{ 5002 };
+constexpr int ERR_PARAM{ 5003 };
+constexpr int ERR_UNK{ 5004 };
+
+enum class dirs { up = 0, down = 1, left = 2, right = 3, up_left = 4, up_right = 5, down_left = 6, down_right = 7, stop = 8 };
+enum class evils { brain = 0, dervish = 1, ghost = 2, soul = 3 };
+enum class assets { armor = 0, life = 1, shot = 2 };
+
+
+namespace dll
+{
+	struct PLATSRV_API FADING
+	{
+		assets type = assets::armor;
+
+		D2D1_RECT_F rect{};
+
+		float opacity()
+		{
+			--delay;
+			if (delay <= 0)
+			{
+				_opacity -= 0.1f;
+				delay = 20;
+			}
+
+			return _opacity;
+		}
+
+	private:
+		int delay = 20;
+		float _opacity{ 1.0f };
+	};
+
+	class PLATSRV_API EXCEPTION
+	{
+	private:
+		int _type{ 0 };
+
+	public:
+		EXCEPTION(int what);
+
+		const wchar_t* eGet()const;
+	};
+
+	template<typename T> class BAG
+	{
+	private:
+		T* mPtr{ nullptr };
+		size_t max_size{ 1 };
+		size_t next_pos{ 0 };
+
+	public:
+
+		BAG()
+		{
+			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+		}
+		BAG(size_t lenght)
+		{
+			max_size = lenght;
+			mPtr = reinterpret_cast<T*>(calloc(lenght, sizeof(T)));
+
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+		}
+		BAG(BAG& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PARAM);
+			else
+			{
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+
+				mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+				
+				if (!mPtr)throw EXCEPTION(ERR_PARAM);
+				else if (next_pos > 0)for (size_t i = 0; i < next_pos; ++i)mPtr[i] = other.mPtr[i];
+			}
+		}
+		BAG(BAG&& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+				mPtr = other.mPtr;
+
+				other.mPtr = nullptr;
+			}
+		}
+
+		~BAG()
+		{
+			free(mPtr);
+		}
+
+		bool empty() const
+		{
+			return(next_pos == 0);
+		}
+		size_t size() const
+		{
+			return next_pos;
+		}
+		size_t capacity() const
+		{
+			return max_size;
+		}
+
+		BAG& operator = (BAG& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PARAM);
+			else
+			{
+				free(mPtr);
+
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+
+				mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+
+				if (!mPtr)throw EXCEPTION(ERR_PARAM);
+				else if (next_pos > 0)for (size_t i = 0; i < next_pos; ++i)mPtr[i] = other.mPtr[i];
+			}
+
+			return *this;
+		}
+		BAG& operator = (BAG&& other)
+		{
+			if (!other.mPtr)throw EXCEPTION(ERR_PARAM);
+			else
+			{
+				free(mPtr);
+
+				max_size = other.max_size;
+				next_pos = other.next_pos;
+				mPtr = other.mPtr;
+
+				other.mPtr = nullptr;
+			}
+
+			return *this;
+		}
+
+		T& operator[](size_t index)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else if (index < 0 || index >= next_pos)throw EXCEPTION(ERR_PARAM);
+			
+			return mPtr[index];
+		}
+		T& front()
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else if (next_pos == 0)throw EXCEPTION(ERR_PARAM);
+
+			return *mPtr;
+		}
+		T& back()
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else if (next_pos == 0)throw EXCEPTION(ERR_PARAM);
+
+			return mPtr[next_pos - 1];
+		}
+
+		void push_back(T element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					mPtr[next_pos] = element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
+					
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else mPtr[next_pos] = element;
+					
+					++next_pos;
+				}
+			}
+		}
+		void push_back(T* element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					mPtr[next_pos] = *element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
+
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else mPtr[next_pos] = *element;
+
+					++next_pos;
+				}
+			}
+		}
+
+		void push_front(T element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t ind = next_pos; ind > 0; --ind)mPtr[ind] = mPtr[ind - 1];
+					*mPtr = element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
+
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else
+					{
+						for (size_t ind = next_pos; ind > 0; --ind)mPtr[ind] = mPtr[ind - 1];
+						*mPtr = element;
+						++next_pos;
+					}
+				}
+			}
+		}
+		void push_front(T* element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t ind = next_pos; ind > 0; --ind)mPtr[ind] = mPtr[ind - 1];
+					*mPtr = *element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
+
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else
+					{
+						for (size_t ind = next_pos; ind > 0; --ind)mPtr[ind] = mPtr[ind - 1];
+						*mPtr = *element;
+						++next_pos;
+					}
+				}
+			}
+		}
+
+		void erase(size_t index)
+		{
+			if (!mPtr) throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (index < 0 || index >= next_pos)throw EXCEPTION(ERR_PARAM);
+
+				for (size_t ind = index; ind < next_pos - 1; ++ind)mPtr[ind] = mPtr[ind + 1];
+				--next_pos;
+			}
+		}
+		void clear()
+		{
+			max_size = 1;
+			next_pos = 0;
+
+			free(mPtr);
+
+			mPtr = reinterpret_cast<T*>(calloc(max_size, sizeof(T)));
+		}
+
+		void insert(size_t index, T element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (index < 0 || index >= next_pos)throw EXCEPTION(ERR_PARAM);
+
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t ind = next_pos; ind > index; --ind)mPtr[ind] = mPtr[ind - 1];
+					mPtr[index] = element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_szie * sizeof(T)));
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else
+					{
+						for (size_t ind = next_pos; ind > index; --ind)mPtr[ind] = mPtr[ind - 1];
+						mPtr[index] = element;
+						++next_pos;
+					}
+				}
+			}
+		}
+		void insert(size_t index, T* element)
+		{
+			if (!mPtr)throw EXCEPTION(ERR_PTR);
+			else
+			{
+				if (index < 0 || index >= next_pos)throw EXCEPTION(ERR_PARAM);
+
+				if (next_pos + 1 <= max_size)
+				{
+					for (size_t ind = next_pos; ind > index; --ind)mPtr[ind] = mPtr[ind - 1];
+					mPtr[index] = *element;
+					++next_pos;
+				}
+				else
+				{
+					++max_size;
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_szie * sizeof(T)));
+					if (!mPtr)throw EXCEPTION(ERR_PTR);
+					else
+					{
+						for (size_t ind = next_pos; ind > index; --ind)mPtr[ind] = mPtr[ind - 1];
+						mPtr[index] = *element;
+						++next_pos;
+					}
+				}
+			}
+		}
+	};
+
+	class PLATSRV_API PROTON
+	{
+	protected:
+		float _width{ 0 };
+		float _height{ 0 };
+
+		D2D1_RECT_F _rect{};
+
+	public:
+		D2D1_POINT_2F start{};
+		D2D1_POINT_2F end{};
+		D2D1_POINT_2F center{};
+
+		float x_rad{ 0 };
+		float y_rad{ 0 };
+
+		PROTON();
+		PROTON(float sx, float sy);
+		PROTON(float sx, float sy, float first_width, float first_height);
+		PROTON(D2D1_POINT_2F start_point, float first_width, float first_height);
+
+		virtual ~PROTON() {};
+
+		float get_width()const;
+		float get_height()const;
+
+		D2D1_RECT_F get_rect()const;
+
+		void new_width(float new_width);
+		void new_height(float new_height);
+		void new_dims(float new_width, float new_height);
+
+		void set_edges();
+	};
+
+}
