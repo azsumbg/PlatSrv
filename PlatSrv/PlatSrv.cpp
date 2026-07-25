@@ -1235,16 +1235,16 @@ bool dll::Intersect(D2D1_RECT_F first, D2D1_RECT_F second)
 bool dll::Intersect(D2D1_POINT_2F first_center, D2D1_POINT_2F second_center, float first_xrad, float second_xrad,
 	float first_yrad, float second_yrad)
 {
-	if (abs(second_center.x - first_center.x) <= first_xrad + second_xrad
-		&& abs(second_center.y - first_center.y) <= first_yrad + second_yrad)return true;
+	if (fabs(second_center.x - first_center.x) <= first_xrad + second_xrad
+		&& fabs(second_center.y - first_center.y) <= first_yrad + second_yrad)return true;
 
 	return false;
 }
 
 float dll::Distance(D2D1_POINT_2F first, D2D1_POINT_2F second)
 {
-	float a = ((float)(pow(abs(second.x - first.x), 2)));
-	float b = ((float)(pow(abs(second.y - first.y), 2)));
+	float a = ((float)(pow(fabs(second.x - first.x), 2)));
+	float b = ((float)(pow(fabs(second.y - first.y), 2)));
 
 	return (float)(sqrt(a + b));
 }
@@ -1272,4 +1272,13 @@ void dll::Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref)
 			}
 		}
 	}
+}
+
+bool dll::Point_on_line(D2D1_POINT_2F start_line, D2D1_POINT_2F end_line, D2D1_POINT_2F check_point)
+{
+	float start_to_point{ Distance(start_line, check_point) };
+	float end_to_point{ Distance(end_line, check_point) };
+	float line_lenght{ Distance(start_line,end_line) + LINE_EPSILON };
+
+	return(line_lenght == start_to_point + end_to_point);
 }

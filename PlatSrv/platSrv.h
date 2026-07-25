@@ -17,6 +17,8 @@ constexpr float scr_height{ 800.0f };
 constexpr float sky{ 50.0f };
 constexpr float ground{ 750.0f };
 
+constexpr float LINE_EPSILON{ 0.001f };
+
 constexpr D2D1_RECT_F FULL_SCREEN{ 0, 0, scr_width, scr_height };
 constexpr D2D1_RECT_F GAME_SCREEN{ 0, sky, scr_width, ground };
 
@@ -541,4 +543,7 @@ namespace dll
 	float PLATSRV_API Distance(D2D1_POINT_2F first, D2D1_POINT_2F second);
 	
 	void PLATSRV_API Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref);
+
+	bool PLATSRV_API Point_on_line(D2D1_POINT_2F start_line, D2D1_POINT_2F end_line, D2D1_POINT_2F check_point);
+
 }
