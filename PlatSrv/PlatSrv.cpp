@@ -899,3 +899,184 @@ dll::GRID_COORD dll::FIELD::get_coord(D2D1_POINT_2F point) const
 }
 
 ///////////////////////////////////////////////////
+
+// HERO class ************************************
+
+dll::HERO::HERO(float _sx, float _sy) :PROTON{ _sx,_sy, 85.0f, 80.0f } {};
+void dll::HERO::set_path(float targ_x, float targ_y)
+{
+	move_sx = start.x;
+	move_sy = start.y;
+	move_ex = targ_x;
+	move_ey = targ_y;
+
+	hor_dir = false;
+	ver_dir = false;
+
+	if (move_sx == move_ex || (move_ex > move_sx && move_ex <= end.x))
+	{
+		ver_dir = true;
+		return;
+	}
+	if (move_sy == move_ey || (move_ey > move_sy && move_ey <= end.y))
+	{
+		hor_dir = true;
+		return;
+	}
+
+	slope = (move_ey - move_sy) / (move_ex - move_sx);
+	intercept = start.y - slope * start.x;
+}
+
+float dll::HERO::get_target_x()const
+{
+	return move_ex;
+}
+float dll::HERO::get_target_y()const
+{
+	return move_ey;
+}
+
+void dll::HERO::move(float gear)
+{
+	float my_speed = _speed + gear / 10.0f;
+
+	if (hor_dir)
+	{
+		if (move_sx > move_ex)
+		{
+			if (start.x - my_speed >= 0)
+			{
+				start.x -= my_speed;
+				set_edges();
+			}
+			if (start.x < 0)
+			{
+				start.x = 0;
+				set_edges();
+			}
+		}
+		else if (move_sx < move_ex)
+		{
+			if (end.x + my_speed <= scr_width)
+			{
+				start.x += my_speed;
+				set_edges();
+			}
+			if (end.x > scr_width)
+			{
+				end.x = scr_width;
+				start.x = end.x - _width;
+				set_edges();
+			}
+		}
+	}
+	else if (ver_dir)
+	{
+		if (move_sy > move_ey)
+		{
+			if (start.y - my_speed >= sky)
+			{
+				start.y -= my_speed;
+				set_edges();
+			}
+			if (start.y < sky)
+			{
+				start.y = sky;
+				set_edges();
+			}
+		}
+		else if (move_sy < move_ey)
+		{
+			if (end.y + my_speed <= ground)
+			{
+				start.y += my_speed;
+				set_edges();
+			}
+			if (end.y > ground)
+			{
+				end.y = ground;
+				start.y = end.y - _height;
+				set_edges();
+			}
+		}
+	}
+	else
+	{
+		if (center.x > move_ex)
+		{
+			if (start.x - my_speed >= 0)
+			{
+				start.x -= my_speed;
+				start.y = start.x * slope + intercept;
+				set_edges();
+			}
+			if (start.x < 0)
+			{
+				start.x = 0;
+				set_edges();
+			}
+		}
+		else if (center.x < move_ex)
+		{
+			if (end.x + my_speed <= scr_width)
+			{
+				start.x += my_speed;
+				start.y = start.x * slope + intercept;
+				set_edges();
+			}
+			if (end.x > scr_width)
+			{
+				end.x = scr_width;
+				start.x = end.x - _width;
+				set_edges();
+			}
+		}
+
+		if (start.y < sky)
+		{
+			start.y = sky;
+			set_edges();
+		}
+		if (end.y > ground)
+		{
+			end.y = ground;
+			start.y = end.y - _height;
+			set_edges();
+		}
+	}
+}
+
+void dll::HERO::set_view_angle()
+{
+	float oppos = abs(move_ex - move_sx);
+	float adj = abs(move_ey - move_sy);
+
+	float ret = static_cast<float>(atan2(oppos, adj) * 180.0f / 3.14f);
+
+	if (move_ey < move_sy)
+	{
+		if (ver_dir)ret = 0;
+		else if (move_ex > move_sx)ret = 90.0f - ret;
+		else if (move_ex < move_sx)ret = ret + 270.0f;
+	}
+	else if (move_ey > move_sy)
+	{
+		if (ver_dir)ret = 180.0f;
+		else if (move_ex > move_sx)ret = 90.0f + ret;
+		else if (move_ex < move_sx)ret = 180.0f - ret;
+	}
+	else
+	{
+		if (move_sx >= move_ex)ret = 90.0f;
+		else ret = 270.0f;
+	}
+
+}
+
+dll::HERO* dll::HERO::create(float sx, float sy)
+{
+	return new HERO(sx, sy);
+}
+
+//////////////////////////////////////////////////

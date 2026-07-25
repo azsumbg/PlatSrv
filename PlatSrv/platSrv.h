@@ -457,7 +457,47 @@ namespace dll
 		GRID_COORD get_coord(D2D1_POINT_2F point) const;
 	};
 
+	class PLATSRV_API HERO :public PROTON
+	{
+	private:
+		float _speed{ 3.0f };
 
+		int frame = 0;
+		int max_frames = 2;
+		int frame_delay = 30;
+		int max_frame_delay = 3;
+
+		bool hor_dir = false;
+		bool ver_dir = false;
+
+		float move_sx{ 0 };
+		float move_ex{ 0 };
+		float move_sy{ 0 };
+		float move_ey{ 0 };
+
+		float slope{ 0 };
+		float intercept{ 0 };
+
+		HERO(float _sx, float _sy);
+
+	public:
+		float angle{ 0 };
+
+		int lifes = 150;
+		int damage = 20;
+		int armor = 1;
+
+		void set_path(float targ_x, float targ_y);
+
+		float get_target_x()const;
+		float get_target_y()const;
+
+		void move(float gear);
+		
+		void set_view_angle();
+
+		static HERO* create(float sx, float sy);
+	};
 
 
 
