@@ -937,6 +937,19 @@ float dll::HERO::get_target_y()const
 	return move_ey;
 }
 
+int dll::HERO::get_frame()
+{
+	--frame_delay;
+	if (frame_delay <= 0)
+	{
+		frame_delay = max_frame_delay;
+		++frame;
+		if (frame > max_frames)frame = 0;
+	}
+
+	return frame;
+}
+
 void dll::HERO::move(float gear)
 {
 	float my_speed = _speed + gear / 10.0f;
@@ -1003,7 +1016,7 @@ void dll::HERO::move(float gear)
 	}
 	else
 	{
-		if (center.x > move_ex)
+		if (move_sx > move_ex)
 		{
 			if (start.x - my_speed >= 0)
 			{
@@ -1017,7 +1030,7 @@ void dll::HERO::move(float gear)
 				set_edges();
 			}
 		}
-		else if (center.x < move_ex)
+		else if (move_sx < move_ex)
 		{
 			if (end.x + my_speed <= scr_width)
 			{
@@ -1074,6 +1087,11 @@ void dll::HERO::set_view_angle()
 
 }
 
+void dll::HERO::Release()
+{
+	delete this;
+}
+
 dll::HERO* dll::HERO::create(float sx, float sy)
 {
 	return new HERO(sx, sy);
@@ -1081,7 +1099,122 @@ dll::HERO* dll::HERO::create(float sx, float sy)
 
 //////////////////////////////////////////////////
 
+// SHOT class ***********************************
 
+dll::SHOT::SHOT(float _sx, float _sy, float _ex, float _ey) :PROTON(_sx, _sy, 6.0f, 10.0f)
+{
+	move_sx = start.x;
+	move_sy = start.y;
+	move_ex = _ex;
+	move_ey = _ex;
+
+	hor_dir = false;
+	ver_dir = false;
+
+	if (move_sx == move_ex || (move_ex > move_sx && move_ex <= end.x))
+	{
+		ver_dir = true;
+		return;
+	}
+	if (move_sy == move_ey || (move_ey > move_sy && move_ey <= end.y))
+	{
+		hor_dir = true;
+		return;
+	}
+
+	slope = (move_ey - move_sy) / (move_ex - move_sx);
+	intercept = start.y - slope * start.x;
+}
+
+bool dll::SHOT::move(float gear)
+{
+	float my_speed = speed + gear / 10.0f;
+
+	if (hor_dir)
+	{
+		if (move_sx > move_ex)
+		{
+			if (start.x - my_speed >= 0)
+			{
+				start.x -= my_speed;
+				set_edges();
+			}
+			else return false;
+		}
+		else if (move_sx < move_ex)
+		{
+			if (end.x + my_speed <= scr_width)
+			{
+				start.x += my_speed;
+				set_edges();
+			}
+			else return false;
+		}
+		else return false;
+	}
+	else if (ver_dir)
+	{
+		if (move_sy > move_ey)
+		{
+			if (start.y - my_speed >= sky)
+			{
+				start.y -= my_speed;
+				set_edges();
+			}
+			else return false;
+		}
+		else if (move_sy < move_ey)
+		{
+			if (end.y + my_speed <= ground)
+			{
+				start.y += my_speed;
+				set_edges();
+			}
+			else return false;
+		}
+		else return false;
+	}
+	else
+	{
+		if (move_sx > move_ex)
+		{
+			if (start.x - my_speed >= 0)
+			{
+				start.x -= my_speed;
+				start.y = start.x * slope + intercept;
+				set_edges();
+			}
+			else return false;
+		}
+		else if (move_sx < move_ex)
+		{
+			if (end.x + my_speed <= scr_width)
+			{
+				start.x += my_speed;
+				start.y = start.x * slope + intercept;
+				set_edges();
+			}
+			else return false;
+		}
+		else return false;
+	}
+
+	if (start.x <= 0 || end.x >= scr_width || start.y <= sky || end.y >= ground)return false;
+
+	return true;
+}
+
+void dll::SHOT::Release()
+{
+	delete this;
+}
+
+dll::SHOT* dll::SHOT::create(float sx, float sy, float ex, float ey)
+{
+	return new SHOT(sx, sy, ex, ey);
+}
+
+/////////////////////////////////////////////////
 
 
 

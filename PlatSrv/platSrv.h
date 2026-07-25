@@ -463,7 +463,7 @@ namespace dll
 		float _speed{ 3.0f };
 
 		int frame = 0;
-		int max_frames = 2;
+		int max_frames = 1;
 		int frame_delay = 30;
 		int max_frame_delay = 3;
 
@@ -492,14 +492,45 @@ namespace dll
 		float get_target_x()const;
 		float get_target_y()const;
 
+		int get_frame();
+
 		void move(float gear);
 		
 		void set_view_angle();
 
+		void Release();
+
 		static HERO* create(float sx, float sy);
 	};
 
+	class PLATSRV_API SHOT :public PROTON
+	{
+	private:
+		float speed = { 8.0f };
 
+		bool hor_dir{ false };
+		bool ver_dir{ false };
+
+		float move_sx{ 0 };
+		float move_ex{ 0 };
+		float move_sy{ 0 };
+		float move_ey{ 0 };
+
+		float slope{ 0 };
+		float intercept{ 0 };
+
+		SHOT(float _sx, float _sy, float _ex, float _ey);
+
+	public:
+
+		int damage{ 0 };
+
+		bool move(float gear);
+
+		void Release();
+
+		SHOT* create(float sx, float sy, float ex, float ey);
+	};
 
 // FUNCTIONS *******************************
 
