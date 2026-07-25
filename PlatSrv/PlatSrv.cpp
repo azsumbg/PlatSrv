@@ -1216,7 +1216,87 @@ dll::SHOT* dll::SHOT::create(float sx, float sy, float ex, float ey)
 
 /////////////////////////////////////////////////
 
+// OBSTACLES class ******************************
 
+dll::OBSTACLE::OBSTACLE(obstacles _type, float _sx, float _sy) :PROTON(_sx, _sy, 32.0f, 32.0f)
+{
+	type = _type;
+	
+	if (type == obstacles::rock)new_dims(100.0f, 100.0f);
+}
+	
+bool dll::OBSTACLE::move(float gear, dirs dir)
+{
+	float my_speed = _speed + gear / 5.0f;
+
+	switch (dir)
+	{
+	case dirs::up:
+		start.y -= my_speed;
+		set_edges();
+		if (end.y <= 0)return false;
+		break;
+
+	case dirs::down:
+		start.y += my_speed;
+		set_edges();
+		if (start.y >= scr_height)return false;
+		break;
+
+	case dirs::left:
+		start.x -= my_speed;
+		set_edges();
+		if (end.x <= -50.0f)return false;
+		break;
+
+	case dirs::right:
+		start.x += my_speed;
+		set_edges();
+		if (start.x >= scr_height + 50.0f)return false;
+		break;
+
+	case dirs::up_left:
+		start.y -= my_speed;
+		start.x -= my_speed;
+		set_edges();
+		if (end.x <= -50.0f || end.y <= 0)return false;
+		break;
+
+	case dirs::up_right:
+		start.y -= my_speed;
+		start.x += my_speed;
+		set_edges();
+		if (start.x >= scr_height + 50.0f || end.y <= 0)return false;
+		break;
+
+	case dirs::down_left:
+		start.y += my_speed;
+		start.x -= my_speed;
+		set_edges();
+		if (end.x <= -50.0f || start.y >= scr_height)return false;
+		break;
+
+	case dirs::down_right:
+		start.y += my_speed;
+		start.x -= my_speed;
+		set_edges();
+		if (start.x >= scr_height + 50.0f || start.y >= scr_height)return false;
+		break;
+	}
+
+	return true;
+}
+void dll::OBSTACLE::Release()
+{
+	delete this;
+}
+
+dll::OBSTACLE* dll::OBSTACLE::create(obstacles my_type, float sx, float sy)
+{
+	return new OBSTACLE(my_type, sx, sy);
+}
+
+/////////////////////////////////////////////////
 
 
 

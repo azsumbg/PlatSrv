@@ -17,6 +17,8 @@ constexpr float scr_height{ 800.0f };
 constexpr float sky{ 50.0f };
 constexpr float ground{ 750.0f };
 
+constexpr float ground_speed{ 1.0f };
+
 constexpr float LINE_EPSILON{ 0.001f };
 
 constexpr D2D1_RECT_F FULL_SCREEN{ 0, 0, scr_width, scr_height };
@@ -34,6 +36,7 @@ enum class dirs { up = 0, down = 1, left = 2, right = 3, up_left = 4, up_right =
 enum class evils { brain = 0, dervish = 1, ghost = 2, soul = 3 };
 enum class assets { armor = 0, life = 1, shot = 2 };
 enum class tiles { grass = 0, grass_blue = 1, grass_red = 2, grass_dirt = 3, dirt = 4 };
+enum class obstacles { tree1 = 0, tree2 = 1, tree3 = 2, boulder = 3, rock = 4};
 
 namespace dll
 {
@@ -441,7 +444,7 @@ namespace dll
 	private:
 		TILE FieldArray[MAX_FIELD_ROWS][MAX_FIELD_COLS]{};
 		
-		float _speed{ 1.0f };
+		float _speed{ ground_speed };
 
 		RANDIT randerer{};
 
@@ -532,6 +535,22 @@ namespace dll
 		void Release();
 
 		SHOT* create(float sx, float sy, float ex, float ey);
+	};
+
+	class PLATSRV_API OBSTACLE :public PROTON
+	{
+	private:
+		float _speed{ ground_speed };
+
+		OBSTACLE(obstacles _type, float _sx, float _sy);
+
+	public:
+		obstacles type{ obstacles::tree1 };
+
+		bool move(float gear, dirs dir);
+		void Release();
+
+		static OBSTACLE* create(obstacles my_type, float sx, float sy);
 	};
 
 // FUNCTIONS *******************************
