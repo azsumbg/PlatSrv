@@ -1080,3 +1080,63 @@ dll::HERO* dll::HERO::create(float sx, float sy)
 }
 
 //////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+// FUNCTIONS *******************************
+
+bool dll::Intersect(D2D1_RECT_F first, D2D1_RECT_F second)
+{
+	if (!(first.left >= second.right || first.right <= second.left
+		|| first.top >= second.bottom || first.bottom <= second.top))return true;
+
+	return false;
+}
+bool dll::Intersect(D2D1_POINT_2F first_center, D2D1_POINT_2F second_center, float first_xrad, float second_xrad,
+	float first_yrad, float second_yrad)
+{
+	if (abs(second_center.x - first_center.x) <= first_xrad + second_xrad
+		&& abs(second_center.y - first_center.y) <= first_yrad + second_yrad)return true;
+
+	return false;
+}
+
+float dll::Distance(D2D1_POINT_2F first, D2D1_POINT_2F second)
+{
+	float a = ((float)(pow(abs(second.x - first.x), 2)));
+	float b = ((float)(pow(abs(second.y - first.y), 2)));
+
+	return (float)(sqrt(a + b));
+}
+
+void dll::Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref)
+{
+	if (Bag.size() < 2)return;
+	else
+	{
+		bool ok = false;
+		
+		while (!ok)
+		{
+			ok = true;
+
+			for (size_t count = 0; count < Bag.size() - 1; ++count)
+			{
+				if (Distance(Bag[count], ref) > Distance(Bag[count + 1], ref))
+				{
+					D2D1_POINT_2F temp = Bag[count];
+					Bag[count] = Bag[count + 1];
+					Bag[count + 1] = Bag[count];
+					ok = false;
+				}
+			}
+		}
+	}
+}

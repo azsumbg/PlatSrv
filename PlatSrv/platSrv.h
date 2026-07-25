@@ -501,5 +501,13 @@ namespace dll
 
 
 
+// FUNCTIONS *******************************
 
+	bool PLATSRV_API Intersect(D2D1_RECT_F first, D2D1_RECT_F second);
+	bool PLATSRV_API Intersect(D2D1_POINT_2F first_center, D2D1_POINT_2F second_center, float first_xrad, float second_xrad,
+		float first_yrad, float second_yrad);
+
+	float PLATSRV_API Distance(D2D1_POINT_2F first, D2D1_POINT_2F second);
+	
+	void PLATSRV_API Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref);
 }
