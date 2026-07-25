@@ -25,13 +25,31 @@ constexpr int ERR_INDEX{ 5002 };
 constexpr int ERR_PARAM{ 5003 };
 constexpr int ERR_UNK{ 5004 };
 
+constexpr int MAX_FIELD_ROWS{ 16 };
+constexpr int MAX_FIELD_COLS{ 22 };
+
 enum class dirs { up = 0, down = 1, left = 2, right = 3, up_left = 4, up_right = 5, down_left = 6, down_right = 7, stop = 8 };
 enum class evils { brain = 0, dervish = 1, ghost = 2, soul = 3 };
 enum class assets { armor = 0, life = 1, shot = 2 };
-
+enum class tiles { grass = 0, grass_blue = 1, grass_red = 2, grass_dirt = 3, dirt = 4 };
 
 namespace dll
 {
+	struct PLATSRV_API TILE
+	{
+		tiles type{ tiles::grass };
+		
+		D2D1_RECT_F rect{};
+
+		float delay{ 0 };
+	};
+	
+	struct PLATSRV_API GRID_COORD
+	{
+		int row{ 0 };
+		int col{ 0 };
+	};
+
 	struct PLATSRV_API FADING
 	{
 		assets type = assets::armor;
@@ -415,5 +433,33 @@ namespace dll
 
 		void set_edges();
 	};
+
+	class PLATSRV_API FIELD
+	{
+	private:
+		TILE FieldArray[MAX_FIELD_ROWS][MAX_FIELD_COLS]{};
+		
+		float _speed{ 1.0f };
+
+		RANDIT randerer{};
+
+		void add_tiles(dirs towhere);
+
+	public:
+
+		FIELD();
+
+		void move(float gear, dirs dir);
+
+		TILE get_tile(int row, int col) const;
+
+		GRID_COORD get_coord(float x, float y) const;
+		GRID_COORD get_coord(D2D1_POINT_2F point) const;
+	};
+
+
+
+
+
 
 }

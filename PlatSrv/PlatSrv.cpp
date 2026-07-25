@@ -229,3 +229,673 @@ void dll::PROTON::set_edges()
 }
 
 ///////////////////////////////////////////////////
+
+// FIELD class ************************************
+
+dll::FIELD::FIELD()
+{
+	float tx = -50.0f;
+	float ty = 0;
+
+	for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+	{
+		for (int col = 0; row < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[row][col].rect.left = tx;
+			FieldArray[row][col].rect.top = ty;
+			FieldArray[row][col].rect.right = tx + 50.0f;
+			FieldArray[row][col].rect.bottom = ty + 50.0f;
+
+			FieldArray[row][col].type = static_cast<tiles>(randerer(0, 4));
+
+			switch (FieldArray[row][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue: 
+				FieldArray[row][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][col].delay = 0.3f;
+				break;
+			}
+
+			tx += 49.0f;
+		}
+
+		ty += 49.0f;
+	}
+}
+
+void dll::FIELD::add_tiles(dirs towhere)
+{
+	switch (towhere)
+	{
+	case dirs::up:
+		for (int row = MAX_FIELD_ROWS - 1; row > 0; --row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row - 1][col];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[0][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[0][col].rect.left = FieldArray[1][col].rect.left;
+			FieldArray[0][col].rect.right = FieldArray[1][col].rect.right;
+			FieldArray[0][col].rect.top = FieldArray[1][col].rect.top - 50.0f;
+			FieldArray[0][col].rect.bottom = FieldArray[1][col].rect.top;
+
+			switch (FieldArray[0][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::down:
+		for (int row = 0; row < MAX_FIELD_ROWS - 1; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row + 1][col];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[MAX_FIELD_ROWS - 1][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+
+			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::left:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = MAX_FIELD_COLS - 1; col > 0; --col)
+			{
+				FieldArray[row][col] = FieldArray[row][col - 1];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][0].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][0].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][0].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][0].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][0].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][0].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][0].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][0].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][0].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][0].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::right:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS - 1; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row][col + 1];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][MAX_FIELD_COLS - 1].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::up_left:
+		for (int row = MAX_FIELD_ROWS - 1; row > 0; --row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row - 1][col];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = MAX_FIELD_COLS - 1; col > 0; --col)
+			{
+				FieldArray[row][col] = FieldArray[row][col - 1];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[0][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[0][col].rect.left = FieldArray[1][col].rect.left;
+			FieldArray[0][col].rect.right = FieldArray[1][col].rect.right;
+			FieldArray[0][col].rect.top = FieldArray[1][col].rect.top - 50.0f;
+			FieldArray[0][col].rect.bottom = FieldArray[1][col].rect.top;
+
+			switch (FieldArray[0][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][0].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][0].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][0].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][0].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][0].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][0].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][0].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][0].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][0].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][0].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::up_right:
+		for (int row = MAX_FIELD_ROWS - 1; row > 0; --row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row - 1][col];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS - 1; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row][col + 1];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[0][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[0][col].rect.left = FieldArray[1][col].rect.left;
+			FieldArray[0][col].rect.right = FieldArray[1][col].rect.right;
+			FieldArray[0][col].rect.top = FieldArray[1][col].rect.top - 50.0f;
+			FieldArray[0][col].rect.bottom = FieldArray[1][col].rect.top;
+
+			switch (FieldArray[0][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][MAX_FIELD_COLS - 1].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::down_left:
+		for (int row = 0; row < MAX_FIELD_ROWS - 1; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row + 1][col];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = MAX_FIELD_COLS - 1; col > 0; --col)
+			{
+				FieldArray[row][col] = FieldArray[row][col - 1];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[MAX_FIELD_ROWS - 1][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+
+			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][0].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][0].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][0].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][0].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][0].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][0].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][0].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][0].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][0].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][0].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+
+	case dirs::down_right:
+		for (int row = 0; row < MAX_FIELD_ROWS - 1; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row + 1][col];
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS - 1; ++col)
+			{
+				FieldArray[row][col] = FieldArray[row][col + 1];
+			}
+		}
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			FieldArray[MAX_FIELD_ROWS - 1][col].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+
+			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
+			{
+			case tiles::dirt:
+				FieldArray[0][col].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[0][col].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[0][col].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[0][col].delay = 0.3f;
+				break;
+			}
+		}
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
+
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
+
+			switch (FieldArray[row][MAX_FIELD_COLS - 1].type)
+			{
+			case tiles::dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.2f;
+				break;
+
+			case tiles::grass_blue:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.25f;
+				break;
+
+			case tiles::grass_red:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.26f;
+				break;
+
+			case tiles::grass_dirt:
+				FieldArray[row][MAX_FIELD_COLS - 1].delay = 0.3f;
+				break;
+			}
+		}
+		break;
+	}
+}
+
+void dll::FIELD::move(float gear, dirs dir)
+{
+	float my_speed = _speed + gear / 5.0f;
+
+	bool need_up{ false };
+	bool need_down{ false };
+	bool need_left{ false };
+	bool need_right{ false };
+
+	switch (dir)
+	{
+	case dirs::up:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top -= my_speed;
+				FieldArray[row][col].rect.bottom -= my_speed;
+			}
+		}
+		if (FieldArray[0][0].rect.top <= 0)add_tiles(dirs::down);
+		break;
+
+	case dirs::down:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top += my_speed;
+				FieldArray[row][col].rect.bottom += my_speed;
+			}
+		}
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)add_tiles(dirs::up);
+		break;
+
+	case dirs::left:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.left -= my_speed;
+				FieldArray[row][col].rect.right -= my_speed;
+			}
+		}
+		if (FieldArray[0][0].rect.right <= -50.0f)add_tiles(dirs::right);
+		break;
+
+	case dirs::right:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.left += my_speed;
+				FieldArray[row][col].rect.right += my_speed;
+			}
+		}
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)add_tiles(dirs::left);
+		break;
+
+	case dirs::up_left:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top -= my_speed;
+				FieldArray[row][col].rect.bottom -= my_speed;
+				FieldArray[row][col].rect.left -= my_speed;
+				FieldArray[row][col].rect.right -= my_speed;
+			}
+		}
+		if (FieldArray[0][0].rect.top <= 0)need_down = true;
+		if (FieldArray[0][0].rect.right <= -50.0f)need_right = true;
+		if (need_down && need_right)add_tiles(dirs::down_right);
+		else if (need_down)add_tiles(dirs::down);
+		else if (need_right)add_tiles(dirs::right);
+		break;
+
+	case dirs::up_right:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top -= my_speed;
+				FieldArray[row][col].rect.bottom -= my_speed;
+				FieldArray[row][col].rect.left += my_speed;
+				FieldArray[row][col].rect.right += my_speed;
+			}
+		}
+		if (FieldArray[0][0].rect.top <= 0)need_down = true;
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)need_left = true;
+		if (need_down && need_left)add_tiles(dirs::down_left);
+		else if (need_down)add_tiles(dirs::down);
+		else if (need_left)add_tiles(dirs::left);
+		break;
+		
+	case dirs::down_left:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top += my_speed;
+				FieldArray[row][col].rect.bottom += my_speed;
+				FieldArray[row][col].rect.left -= my_speed;
+				FieldArray[row][col].rect.right -= my_speed;
+			}
+		}
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)need_up = true;
+		if (FieldArray[0][0].rect.right <= -50.0f)need_right = true;
+		if (need_up && need_right)add_tiles(dirs::up_right);
+		else if (need_up)add_tiles(dirs::up);
+		else if (need_right)add_tiles(dirs::right);
+		break;
+
+	case dirs::down_right:
+		for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+		{
+			for (int col = 0; col < MAX_FIELD_COLS; ++col)
+			{
+				FieldArray[row][col].rect.top += my_speed;
+				FieldArray[row][col].rect.bottom += my_speed;
+				FieldArray[row][col].rect.left += my_speed;
+				FieldArray[row][col].rect.right += my_speed;
+			}
+		}
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)need_up = true;
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)need_left = true;
+		if (need_up && need_left)add_tiles(dirs::up_left);
+		else if (need_up)add_tiles(dirs::up);
+		else if (need_left)add_tiles(dirs::left);
+		break;
+	}
+
+}
+
+dll::TILE dll::FIELD::get_tile(int row, int col) const
+{
+	return FieldArray[row][col];
+}
+
+dll::GRID_COORD dll::FIELD::get_coord(float x, float y) const
+{
+	GRID_COORD ret{ -1, -1 };
+
+	for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+	{
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			if (x >= FieldArray[row][col].rect.left && x <= FieldArray[row][col].rect.right)ret.col = col;
+			if (y >= FieldArray[row][col].rect.top && y <= FieldArray[row][col].rect.bottom)ret.row = row;
+		
+			if (ret.col != -1 && ret.row != -1)break;
+		}
+	}
+
+	return ret;
+}
+dll::GRID_COORD dll::FIELD::get_coord(D2D1_POINT_2F point) const
+{
+	GRID_COORD ret{ -1, -1 };
+
+	for (int row = 0; row < MAX_FIELD_ROWS; ++row)
+	{
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
+		{
+			if (point.x >= FieldArray[row][col].rect.left && point.x <= FieldArray[row][col].rect.right)ret.col = col;
+			if (point.y >= FieldArray[row][col].rect.top && point.y <= FieldArray[row][col].rect.bottom)ret.row = row;
+
+			if (ret.col != -1 && ret.row != -1)break;
+		}
+	}
+
+	return ret;
+}
+
+///////////////////////////////////////////////////
