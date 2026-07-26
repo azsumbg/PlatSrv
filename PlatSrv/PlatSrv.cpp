@@ -1362,3 +1362,22 @@ bool dll::Point_on_line(D2D1_POINT_2F start_line, D2D1_POINT_2F end_line, D2D1_P
 
 	return(line_lenght == start_to_point + end_to_point);
 }
+
+bool dll::Line_box_intersect(D2D1_RECT_F Box, float slope, float intercept)
+{
+	bool y_intersect{ false };
+	bool x_intersect{ false };
+
+	float left_line_y{ Box.left * slope + intercept };
+	float right_line_y{ Box.right * slope + intercept };
+
+	float top_line_x{ (Box.top - intercept) / slope };
+	float bottom_line_x{ (Box.bottom - intercept) / slope };
+
+	y_intersect = ((left_line_y >= Box.top && left_line_y <= Box.bottom)
+		|| (right_line_y >= Box.top && right_line_y <= Box.bottom));
+	x_intersect= ((top_line_x >= Box.left && top_line_x <= Box.right)
+		|| (bottom_line_x >= Box.left && bottom_line_x <= Box.right));
+
+	return(x_intersect && y_intersect);
+}
