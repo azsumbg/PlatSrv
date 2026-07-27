@@ -37,6 +37,7 @@ enum class evils { brain = 0, dervish = 1, ghost = 2, soul = 3 };
 enum class assets { armor = 0, life = 1, shot = 2 };
 enum class tiles { grass = 0, grass_blue = 1, grass_red = 2, grass_dirt = 3, dirt = 4 };
 enum class obstacles { tree1 = 0, tree2 = 1, tree3 = 2, boulder = 3, rock = 4};
+enum class actions { move = 0, attack = 1 };
 
 namespace dll
 {
@@ -553,7 +554,62 @@ namespace dll
 		static OBSTACLE* create(obstacles my_type, float sx, float sy);
 	};
 
-// FUNCTIONS *******************************
+	class PLATSRV_API EVILS :public PROTON
+	{
+	private:
+
+		int frame{ 0 };
+		int max_frames{ 0 };
+		int frame_delay{ 0 };
+		int max_frame_delay{ 0 };
+
+		int attack_delay{ 0 };
+		int max_attack_delay{ 0 };
+
+		float speed{ 0 };
+
+		bool hor_dir = false;
+		bool ver_dir = false;
+
+		float move_sx{ 0 };
+		float move_ex{ 0 };
+		float move_sy{ 0 };
+		float move_ey{ 0 };
+
+		float slope{ 0 };
+		float intercept{ 0 };
+
+		float final_target_x{ 0 };
+		float final_target_y{ 0 };
+		bool obstacle_on_path{ false };
+
+		float view_range{ 0 };
+
+		EVILS(evils what, float _sx, float _sy);
+
+	public:
+		evils type{};
+		int lifes{ 0 };
+		int damage{ 0 };
+		int armor{ 0 };
+
+		void move(float gear);
+		void set_path(float targ_x, float targ_y);
+
+		float get_target_x()const;
+		float get_target_y()const;
+
+		int get_frame();
+		int attack();
+
+		void Release();
+
+		actions AIMove(BAG<D2D1_POINT_2F>& AssetsCenters, BAG<D2D1_RECT_F>& ObstBag, D2D1_POINT_2F hero_center);
+
+		static EVILS* create(evils what, float sx, float sy);
+	};
+
+	// FUNCTIONS *******************************
 
 	bool PLATSRV_API Intersect(D2D1_RECT_F first, D2D1_RECT_F second);
 	bool PLATSRV_API Intersect(D2D1_POINT_2F first_center, D2D1_POINT_2F second_center, float first_xrad, float second_xrad,

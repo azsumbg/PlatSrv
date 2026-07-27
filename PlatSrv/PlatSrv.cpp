@@ -1298,9 +1298,194 @@ dll::OBSTACLE* dll::OBSTACLE::create(obstacles my_type, float sx, float sy)
 
 /////////////////////////////////////////////////
 
+// EVILS class *********************************
+
+dll::EVILS::EVILS(evils what, float _sx, float _sy) :PROTON(_sx, _sy)
+{
+	type = what;
+
+	switch (type)
+	{
+	case evils::brain:
+		speed = 0.5f;
+		new_dims(75.0f, 65.0f);
+		max_frames = 201;
+		frame_delay = 1;
+		lifes = 100;
+		damage = 10;
+		armor = 0;
+		attack_delay = 80;
+		view_range = 150.0f;
+		break;
+
+	case evils::dervish:
+		speed = 0.6f;
+		new_dims(70.0f, 94.0f);
+		max_frames = 67;
+		frame_delay = 1;
+		lifes = 120;
+		damage = 12;
+		armor = 1;
+		attack_delay = 90;
+		view_range = 175.0f;
+		break;
+
+	case evils::ghost:
+		speed = 0.8f;
+		new_dims(80.0f, 96.0f);
+		max_frames = 222;
+		frame_delay = 1;
+		lifes = 90;
+		damage = 15;
+		armor = 0;
+		attack_delay = 70;
+		view_range = 200.0f;
+		break;
+
+	case evils::soul:
+		speed = 1.0f;
+		new_dims(28.0f, 50.0f);
+		max_frames = 119;
+		frame_delay = 1;
+		lifes = 50;
+		damage = 8;
+		armor = 0;
+		attack_delay = 60;
+		view_range = 250.0f;
+		break;
 
 
 
+
+
+	}
+
+	max_frame_delay = frame_delay;
+	max_attack_delay = attack_delay;
+}
+
+void dll::EVILS::set_path(float targ_x, float targ_y)
+{
+	move_sx = start.x;
+	move_sy = start.y;
+	move_ex = targ_x;
+	move_ey = targ_y;
+
+	hor_dir = false;
+	ver_dir = false;
+
+	if (move_sx == move_ex || (move_ex > move_sx && move_ex <= end.x))
+	{
+		ver_dir = true;
+		return;
+	}
+	if (move_sy == move_ey || (move_ey > move_sy && move_ey <= end.y))
+	{
+		hor_dir = true;
+		return;
+	}
+
+	slope = (move_ey - move_sy) / (move_ex - move_sx);
+	intercept = start.y - slope * start.x;
+}
+
+float dll::EVILS::get_target_x()const
+{
+	return move_ex;
+}
+float dll::EVILS::get_target_y()const
+{
+	return move_ey;
+}
+
+int dll::EVILS::get_frame()
+{
+	--frame_delay;
+
+	if (frame_delay <= 0)
+	{
+		frame_delay = max_frame_delay;
+		++frame;
+		if (frame > max_frames)frame = 0;
+	}
+
+	return frame;
+}
+int dll::EVILS::attack()
+{
+	--attack_delay;
+	if (attack_delay <= 0)
+	{
+		attack_delay = max_attack_delay;
+		return damage;
+	}
+
+	return 0;
+}
+
+void dll::EVILS::Release()
+{
+	delete this;
+}
+
+void dll::EVILS::move(float gear)
+{
+	float my_speed = speed + gear / 10.0f;
+
+	if (hor_dir)
+	{
+		if (move_sx > move_ex)
+		{
+			start.x -= my_speed;
+			set_edges();
+		}
+		else if (move_sx < move_ex)
+		{
+			start.x += my_speed;
+			set_edges();
+		}
+	}
+	else if (ver_dir)
+	{
+		if (move_sy > move_ey)
+		{
+			start.y -= my_speed;
+			set_edges();
+		}
+		else if (move_sy < move_ey)
+		{
+			start.y += my_speed;
+			set_edges();
+		}
+	}
+	else
+	{
+		if (move_sx > move_ex)
+		{
+			start.x -= my_speed;
+			start.y = start.x * slope + intercept;
+			set_edges();
+		}
+		else if (move_sx < move_ex)
+		{
+			start.x += my_speed;
+			start.y = start.x * slope + intercept;
+			set_edges();
+		}
+	}
+}
+
+actions dll::EVILS::AIMove(BAG<D2D1_POINT_2F>& AssetsCenters, BAG<D2D1_RECT_F>& ObstBag, D2D1_POINT_2F hero_center)
+{
+
+}
+
+dll::EVILS* dll::EVILS::create(evils what, float sx, float sy)
+{
+	return new EVILS(what, sx, sy);
+}
+
+////////////////////////////////////////////////
 
 
 // FUNCTIONS *******************************
