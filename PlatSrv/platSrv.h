@@ -619,6 +619,8 @@ namespace dll
 	
 	void PLATSRV_API Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref);
 
+	void PLATSRV_API Sort(BAG<D2D1_RECT_F>& Bag, D2D1_POINT_2F ref);
+
 	bool PLATSRV_API Point_on_line(D2D1_POINT_2F start_line, D2D1_POINT_2F end_line, D2D1_POINT_2F check_point);
 
 	bool PLATSRV_API Line_box_intersect(D2D1_RECT_F Box, float slope, float intercept);

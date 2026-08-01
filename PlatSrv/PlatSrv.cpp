@@ -1477,7 +1477,8 @@ void dll::EVILS::move(float gear)
 
 actions dll::EVILS::AIMove(BAG<D2D1_POINT_2F>& AssetsCenters, BAG<D2D1_RECT_F>& ObstBag, D2D1_POINT_2F hero_center)
 {
-
+	Sort(AssetsCenters, center);
+	Sort(ObstBag, center);
 }
 
 dll::EVILS* dll::EVILS::create(evils what, float sx, float sy)
@@ -1534,6 +1535,35 @@ void dll::Sort(BAG<D2D1_POINT_2F>& Bag, D2D1_POINT_2F ref)
 					Bag[count + 1] = Bag[count];
 					ok = false;
 				}
+			}
+		}
+	}
+}
+
+void dll::Sort(BAG<D2D1_RECT_F>& Bag, D2D1_POINT_2F ref)
+{
+	if (Bag.size() < 2)return;
+
+	bool ok{ false };
+	
+	while (!ok)
+	{
+		ok = true;
+
+		for (size_t count = 0; count < Bag.size() - 1; ++count)
+		{
+			D2D1_POINT_2F bag_first_center{ Bag[count].left + (Bag[count].right - Bag[count].left) / 2.0f,
+			Bag[count].top + (Bag[count].bottom - Bag[count].top) / 2.0f };
+			D2D1_POINT_2F bag_second_center{ Bag[count + 1].left + (Bag[count + 1].right - Bag[count + 1].left) / 2.0f,
+			Bag[count + 1].top + (Bag[count + 1].bottom - Bag[count + 1].top) / 2.0f };
+
+			if (Distance(bag_first_center, ref) > Distance(bag_second_center, ref))
+			{
+				ok = false;
+				D2D1_RECT_F temp{ Bag[count] };
+			
+				Bag[count] = Bag[count + 1];
+				Bag[count + 1] = temp;
 			}
 		}
 	}
