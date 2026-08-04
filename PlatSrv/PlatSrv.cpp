@@ -1362,6 +1362,16 @@ dll::EVILS::EVILS(evils what, float _sx, float _sy) :PROTON(_sx, _sy)
 
 	max_frame_delay = frame_delay;
 	max_attack_delay = attack_delay;
+
+	action = actions::patrol;
+	
+	float targ_x = _randerer(50.0f, 100.0f);
+	float targ_y = sky + _randerer(50.0f, 100.0f);
+
+	if (_sx < scr_width / 2.0f)targ_x = scr_width - _randerer(50.0f, 100.0f);
+	if (_sy < scr_height / 2.0f)targ_y = scr_height / 2.0f + _randerer(50.0f, 100.0f);
+
+	set_path(targ_x, targ_y);
 }
 
 void dll::EVILS::set_path(float targ_x, float targ_y)
@@ -1479,6 +1489,407 @@ actions dll::EVILS::AIMove(BAG<D2D1_POINT_2F>& AssetsCenters, BAG<D2D1_RECT_F>& 
 {
 	Sort(AssetsCenters, center);
 	Sort(ObstBag, center);
+
+	if (action == actions::move)
+	{
+		if (Distance(center, hero_center) <= view_range)action = actions::attack;
+		else if (obstacle_on_path)
+		{
+			if (ObstBag.empty())
+			{
+				obstacle_on_path = false;
+				action = actions::patrol;
+			}
+			else if (Line_box_intersect(ObstBag.front(), slope, intercept))
+			{
+				if (center.x >= ObstBag.front().left && center.x <= ObstBag.front().right)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().right < center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+					
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+						
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().bottom + 50.0f);
+						
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+						
+						action = actions::move;
+					}
+					else if(ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+						
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+					
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().left > center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+						
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+						
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+						
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+						
+						action = actions::move;
+					}
+				}
+			}
+			else
+			{
+				if (move_sx > final_target_x)
+				{
+					if (start.x <= final_target_x)
+					{
+						if (move_sy < final_target_y)
+						{
+							if (start.y >= final_target_y)set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+						else if (move_sy > final_target_y)
+						{
+							if (start.y <= final_target_y)set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+						else if (move_sy == final_target_y)
+						{
+							set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+					}
+				}
+				else if (move_sx < final_target_x)
+				{
+					if (start.x >= final_target_x)
+					{
+						if (move_sy < final_target_y)
+						{
+							if (start.y >= final_target_y)set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+						else if (move_sy > final_target_y)
+						{
+							if (start.y <= final_target_y)set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+						else if (move_sy == final_target_y)
+						{
+							set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+					}
+				}
+				else if (move_sx == final_target_x)
+				{
+
+					if (move_sy < final_target_y)
+					{
+						if (start.y >= final_target_y)
+						{
+							set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+					}
+					else if (move_sy > final_target_y)
+					{
+						if (start.y <= final_target_y)
+						{
+							set_path(move_ex, move_ey);
+							obstacle_on_path = false;
+						}
+					}
+					else if (move_sy == final_target_y)
+					{
+						set_path(move_ex, move_ey);
+						obstacle_on_path = false;
+					}
+				}
+			}
+		}
+		else
+		{
+			if (Line_box_intersect(ObstBag.front(), slope, intercept))
+			{
+				if (center.x >= ObstBag.front().left && center.x <= ObstBag.front().right)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().right < center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().left > center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+			}
+		}
+	}
+	else if (action == actions::patrol)
+	{
+		if (Distance(center, hero_center) <= view_range)action = actions::attack;
+		else if (!AssetsCenters.empty())
+		{
+			action = actions::move;
+			set_path(AssetsCenters.front().x, AssetsCenters.front().y);
+		}
+		else
+		{
+			if (move_ex < move_sx)
+			{
+				if (start.x <= move_ex)
+				{
+					if (_randerer(0, 2) == 1)
+					{
+						if (move_ey < move_sy)
+						{
+							if (start.y <= move_ey)set_path(scr_width - _randerer(50.0f, 100.0f), ground - _randerer(50.0f, 100.0f));
+						}
+						else if (move_ey > move_sy)
+						{
+							if (end.y >= move_ey)set_path(scr_width - _randerer(50.0f, 100.0f), sky + _randerer(50.0f, 100.0f));
+						}
+						else set_path(scr_width - _randerer(50.0f, 100.0f), center.y + _randerer(50.0f, 100.0f));
+					}
+					else
+					{
+						if (move_ey < move_sy)
+						{
+							if (start.y <= move_ey)set_path(scr_width - _randerer(50.0f, 100.0f), 
+								ground - _randerer(50.0f, 100.0f));
+						}
+						else if (move_ey > move_sy)
+						{
+							if (end.y >= move_ey)set_path(scr_width - _randerer(50.0f, 100.0f), sky + _randerer(50.0f, 100.0f));
+						}
+						else set_path(scr_width - _randerer(50.0f, 100.0f), center.y + _randerer(50.0f, 100.0f));
+					}
+				}
+			}
+			else if (move_ex > move_sx)
+			{
+				if (end.x >= move_ex)
+				{
+					if (_randerer(0, 2) == 1)
+					{
+						if (move_ey < move_sy)
+						{
+							if (start.y <= move_ey)set_path(_randerer(50.0f, 100.0f), ground - _randerer(50.0f, 100.0f));
+						}
+						else if (move_ey > move_sy)
+						{
+							if (end.y >= move_ey)set_path(_randerer(50.0f, 100.0f), sky + _randerer(50.0f, 100.0f));
+						}
+						else set_path(_randerer(50.0f, 100.0f), center.y + _randerer(50.0f, 100.0f));
+					}
+					else
+					{
+						if (move_ey < move_sy)
+						{
+							if (start.y <= move_ey)set_path(_randerer(50.0f, 100.0f), ground - _randerer(50.0f, 100.0f));
+						}
+						else if (move_ey > move_sy)
+						{
+							if (end.y >= move_ey)set_path(_randerer(50.0f, 100.0f), sky + _randerer(50.0f, 100.0f));
+						}
+						else set_path(_randerer(50.0f, 100.0f), center.y + _randerer(50.0f, 100.0f));
+					}
+				}
+			}
+			else
+			{
+				if (move_ey < move_sy)
+				{
+					if (start.y <= move_ey)set_path(_randerer(50.0f, scr_width - 100.0f), ground - _randerer(50.0f, 100.0f));
+				}
+				else if (move_ey > move_sy)
+				{
+					if (end.y >= move_ey)set_path(_randerer(50.0f, scr_width - 100.0f), sky + _randerer(50.0f, 100.0f));
+				}
+				else set_path(_randerer(50.0f, scr_width - 100.0f), center.y + _randerer(50.0f, 100.0f));
+			}
+		}
+	}
+
+	return action;
 }
 
 dll::EVILS* dll::EVILS::create(evils what, float sx, float sy)
@@ -1594,5 +2005,5 @@ bool dll::Line_box_intersect(D2D1_RECT_F Box, float slope, float intercept)
 	x_intersect= ((top_line_x >= Box.left && top_line_x <= Box.right)
 		|| (bottom_line_x >= Box.left && bottom_line_x <= Box.right));
 
-	return(x_intersect && y_intersect);
+	return(x_intersect || y_intersect);
 }

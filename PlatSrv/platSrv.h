@@ -37,7 +37,7 @@ enum class evils { brain = 0, dervish = 1, ghost = 2, soul = 3 };
 enum class assets { armor = 0, life = 1, shot = 2 };
 enum class tiles { grass = 0, grass_blue = 1, grass_red = 2, grass_dirt = 3, dirt = 4 };
 enum class obstacles { tree1 = 0, tree2 = 1, tree3 = 2, boulder = 3, rock = 4};
-enum class actions { move = 0, attack = 1 };
+enum class actions { move = 0, attack = 1, patrol = 2 };
 
 namespace dll
 {
@@ -352,7 +352,7 @@ namespace dll
 				else
 				{
 					++max_size;
-					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_szie * sizeof(T)));
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
 					if (!mPtr)throw EXCEPTION(ERR_PTR);
 					else
 					{
@@ -379,7 +379,7 @@ namespace dll
 				else
 				{
 					++max_size;
-					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_szie * sizeof(T)));
+					mPtr = reinterpret_cast<T*>(realloc(mPtr, max_size * sizeof(T)));
 					if (!mPtr)throw EXCEPTION(ERR_PTR);
 					else
 					{
@@ -558,6 +558,7 @@ namespace dll
 	{
 	private:
 
+		RANDIT _randerer{};
 		int frame{ 0 };
 		int max_frames{ 0 };
 		int frame_delay{ 0 };
@@ -589,6 +590,8 @@ namespace dll
 
 	public:
 		evils type{};
+		actions action{ actions::patrol };
+		
 		int lifes{ 0 };
 		int damage{ 0 };
 		int armor{ 0 };
