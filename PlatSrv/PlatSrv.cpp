@@ -239,7 +239,7 @@ dll::FIELD::FIELD()
 
 	for (int row = 0; row < MAX_FIELD_ROWS; ++row)
 	{
-		for (int col = 0; row < MAX_FIELD_COLS; ++col)
+		for (int col = 0; col < MAX_FIELD_COLS; ++col)
 		{
 			FieldArray[row][col].rect.left = tx;
 			FieldArray[row][col].rect.top = ty;
@@ -270,6 +270,7 @@ dll::FIELD::FIELD()
 			tx += 49.0f;
 		}
 
+		tx = -50.0f;
 		ty += 49.0f;
 	}
 }
@@ -330,8 +331,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.bottom;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 1][col].rect.top + 50.0f;
 
 			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
 			{
@@ -404,8 +405,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 		{
 			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
 
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][MAX_FIELD_COLS - 2].rect.right;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][MAX_FIELD_COLS - 1].rect.left + 50.0f;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
 
@@ -550,8 +551,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 		{
 			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
 
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][MAX_FIELD_COLS - 2].rect.right;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][MAX_FIELD_COLS - 1].rect.left + 50.0f;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
 
@@ -597,8 +598,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.bottom;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 1][col].rect.top + 50.0f;
 
 			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
 			{
@@ -670,8 +671,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.left = FieldArray[MAX_FIELD_ROWS - 2][col].rect.left;
 			FieldArray[MAX_FIELD_ROWS - 1][col].rect.right = FieldArray[MAX_FIELD_ROWS - 2][col].rect.right;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top - 50.0f;
-			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 2][col].rect.top;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.top = FieldArray[MAX_FIELD_ROWS - 2][col].rect.bottom;
+			FieldArray[MAX_FIELD_ROWS - 1][col].rect.bottom = FieldArray[MAX_FIELD_ROWS - 1][col].rect.top + 50.0f;
 
 			switch (FieldArray[MAX_FIELD_ROWS - 1][col].type)
 			{
@@ -696,8 +697,8 @@ void dll::FIELD::add_tiles(dirs towhere)
 		{
 			FieldArray[row][MAX_FIELD_COLS - 1].type = static_cast<tiles>(randerer(0, 4));
 
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][1].rect.left - 50.0f;
-			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][1].rect.left;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.left = FieldArray[row][MAX_FIELD_COLS - 2].rect.right;
+			FieldArray[row][MAX_FIELD_COLS - 1].rect.right = FieldArray[row][MAX_FIELD_COLS - 1].rect.left + 50.0f;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.top = FieldArray[row][1].rect.top;
 			FieldArray[row][MAX_FIELD_COLS - 1].rect.bottom = FieldArray[row][1].rect.bottom;
 
