@@ -745,7 +745,7 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.bottom -= my_speed;
 			}
 		}
-		if (FieldArray[0][0].rect.top <= 0)add_tiles(dirs::down);
+		if (FieldArray[0][0].rect.top < 0)add_tiles(dirs::down);
 		break;
 
 	case dirs::down:
@@ -757,7 +757,7 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.bottom += my_speed;
 			}
 		}
-		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)add_tiles(dirs::up);
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top > scr_height)add_tiles(dirs::up);
 		break;
 
 	case dirs::left:
@@ -769,7 +769,7 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right -= my_speed;
 			}
 		}
-		if (FieldArray[0][0].rect.right <= -50.0f)add_tiles(dirs::right);
+		if (FieldArray[0][0].rect.right < -50.0f)add_tiles(dirs::right);
 		break;
 
 	case dirs::right:
@@ -781,7 +781,7 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right += my_speed;
 			}
 		}
-		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)add_tiles(dirs::left);
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left > scr_width + 50.0f)add_tiles(dirs::left);
 		break;
 
 	case dirs::up_left:
@@ -795,8 +795,8 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right -= my_speed;
 			}
 		}
-		if (FieldArray[0][0].rect.top <= 0)need_down = true;
-		if (FieldArray[0][0].rect.right <= -50.0f)need_right = true;
+		if (FieldArray[0][0].rect.top < 0)need_down = true;
+		if (FieldArray[0][0].rect.right < -50.0f)need_right = true;
 		if (need_down && need_right)add_tiles(dirs::down_right);
 		else if (need_down)add_tiles(dirs::down);
 		else if (need_right)add_tiles(dirs::right);
@@ -813,8 +813,8 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right += my_speed;
 			}
 		}
-		if (FieldArray[0][0].rect.top <= 0)need_down = true;
-		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)need_left = true;
+		if (FieldArray[0][0].rect.top < 0)need_down = true;
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left > scr_width + 50.0f)need_left = true;
 		if (need_down && need_left)add_tiles(dirs::down_left);
 		else if (need_down)add_tiles(dirs::down);
 		else if (need_left)add_tiles(dirs::left);
@@ -831,8 +831,8 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right -= my_speed;
 			}
 		}
-		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)need_up = true;
-		if (FieldArray[0][0].rect.right <= -50.0f)need_right = true;
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top > scr_height)need_up = true;
+		if (FieldArray[0][0].rect.right < -50.0f)need_right = true;
 		if (need_up && need_right)add_tiles(dirs::up_right);
 		else if (need_up)add_tiles(dirs::up);
 		else if (need_right)add_tiles(dirs::right);
@@ -849,8 +849,8 @@ void dll::FIELD::move(float gear, dirs dir)
 				FieldArray[row][col].rect.right += my_speed;
 			}
 		}
-		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top >= scr_height)need_up = true;
-		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left >= scr_width + 50.0f)need_left = true;
+		if (FieldArray[MAX_FIELD_ROWS - 1][0].rect.top > scr_height)need_up = true;
+		if (FieldArray[0][MAX_FIELD_COLS - 1].rect.left > scr_width + 50.0f)need_left = true;
 		if (need_up && need_left)add_tiles(dirs::up_left);
 		else if (need_up)add_tiles(dirs::up);
 		else if (need_left)add_tiles(dirs::left);
@@ -903,7 +903,10 @@ dll::GRID_COORD dll::FIELD::get_coord(D2D1_POINT_2F point) const
 
 // HERO class ************************************
 
-dll::HERO::HERO(float _sx, float _sy) :PROTON{ _sx,_sy, 85.0f, 80.0f } {};
+dll::HERO::HERO(float _sx, float _sy) :PROTON{ _sx,_sy, 85.0f, 80.0f } 
+{
+	max_frame_delay = 40;
+};
 void dll::HERO::set_path(float targ_x, float targ_y)
 {
 	move_sx = start.x;
