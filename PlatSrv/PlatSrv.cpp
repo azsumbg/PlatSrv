@@ -267,11 +267,11 @@ dll::FIELD::FIELD()
 				break;
 			}
 
-			tx += 49.0f;
+			tx += 50.0f;
 		}
 
 		tx = -50.0f;
-		ty += 49.0f;
+		ty += 50.0f;
 	}
 }
 
@@ -905,7 +905,7 @@ dll::GRID_COORD dll::FIELD::get_coord(D2D1_POINT_2F point) const
 
 dll::HERO::HERO(float _sx, float _sy) :PROTON{ _sx,_sy, 85.0f, 80.0f } 
 {
-	max_frame_delay = 40;
+	max_frame_delay = 20;
 };
 void dll::HERO::set_path(float targ_x, float targ_y)
 {
