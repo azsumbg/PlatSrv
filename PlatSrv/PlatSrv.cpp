@@ -962,6 +962,7 @@ void dll::HERO::move(float gear)
 	{
 		if (move_sx > move_ex)
 		{
+			dir = dirs::left;
 			if (start.x - my_speed >= 0)
 			{
 				start.x -= my_speed;
@@ -969,12 +970,15 @@ void dll::HERO::move(float gear)
 			}
 			if (start.x < 0)
 			{
+				dir = dirs::stop;
+
 				start.x = 0;
 				set_edges();
 			}
 		}
 		else if (move_sx < move_ex)
 		{
+			dir = dirs::right;
 			if (end.x + my_speed <= scr_width)
 			{
 				start.x += my_speed;
@@ -982,6 +986,8 @@ void dll::HERO::move(float gear)
 			}
 			if (end.x > scr_width)
 			{
+				dir = dirs::stop;
+
 				end.x = scr_width;
 				start.x = end.x - _width;
 				set_edges();
@@ -992,6 +998,7 @@ void dll::HERO::move(float gear)
 	{
 		if (move_sy > move_ey)
 		{
+			dir = dirs::up;
 			if (start.y - my_speed >= sky)
 			{
 				start.y -= my_speed;
@@ -999,12 +1006,15 @@ void dll::HERO::move(float gear)
 			}
 			if (start.y < sky)
 			{
+				dir = dirs::stop;
+
 				start.y = sky;
 				set_edges();
 			}
 		}
 		else if (move_sy < move_ey)
 		{
+			dir = dirs::down;
 			if (end.y + my_speed <= ground)
 			{
 				start.y += my_speed;
@@ -1012,6 +1022,7 @@ void dll::HERO::move(float gear)
 			}
 			if (end.y > ground)
 			{
+				dir = dirs::stop;
 				end.y = ground;
 				start.y = end.y - _height;
 				set_edges();
@@ -1022,6 +1033,9 @@ void dll::HERO::move(float gear)
 	{
 		if (move_sx > move_ex)
 		{
+			if (move_sy > move_ey)dir = dirs::up_left;
+			else dir = dirs::down_left;
+
 			if (start.x - my_speed >= 0)
 			{
 				start.x -= my_speed;
@@ -1030,12 +1044,16 @@ void dll::HERO::move(float gear)
 			}
 			if (start.x < 0)
 			{
+				dir = dirs::stop;
 				start.x = 0;
 				set_edges();
 			}
 		}
 		else if (move_sx < move_ex)
 		{
+			if (move_sy > move_ey)dir = dirs::up_right;
+			else dir = dirs::down_right;
+
 			if (end.x + my_speed <= scr_width)
 			{
 				start.x += my_speed;
@@ -1044,6 +1062,7 @@ void dll::HERO::move(float gear)
 			}
 			if (end.x > scr_width)
 			{
+				dir = dirs::stop;
 				end.x = scr_width;
 				start.x = end.x - _width;
 				set_edges();
@@ -1052,11 +1071,13 @@ void dll::HERO::move(float gear)
 
 		if (start.y < sky)
 		{
+			dir = dirs::stop;
 			start.y = sky;
 			set_edges();
 		}
 		if (end.y > ground)
 		{
+			dir = dirs::stop;
 			end.y = ground;
 			start.y = end.y - _height;
 			set_edges();
