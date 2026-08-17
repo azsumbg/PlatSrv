@@ -968,6 +968,10 @@ void dll::HERO::move(float gear)
 				start.x -= my_speed;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.x <= move_ex)dir = dirs::stop;
+
 			if (start.x < 0)
 			{
 				dir = dirs::stop;
@@ -984,6 +988,10 @@ void dll::HERO::move(float gear)
 				start.x += my_speed;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.x >= move_ex)dir = dirs::stop;
+
 			if (end.x > scr_width)
 			{
 				dir = dirs::stop;
@@ -1004,6 +1012,10 @@ void dll::HERO::move(float gear)
 				start.y -= my_speed;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.y <= move_ey)dir = dirs::stop;
+
 			if (start.y < sky)
 			{
 				dir = dirs::stop;
@@ -1020,6 +1032,10 @@ void dll::HERO::move(float gear)
 				start.y += my_speed;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.y >= move_ey)dir = dirs::stop;
+
 			if (end.y > ground)
 			{
 				dir = dirs::stop;
@@ -1042,6 +1058,10 @@ void dll::HERO::move(float gear)
 				start.y = start.x * slope + intercept;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.x <= move_ex)dir = dirs::stop;
+
 			if (start.x < 0)
 			{
 				dir = dirs::stop;
@@ -1060,6 +1080,10 @@ void dll::HERO::move(float gear)
 				start.y = start.x * slope + intercept;
 				set_edges();
 			}
+			else dir = dirs::stop;
+
+			if (center.x >= move_ex)dir = dirs::stop;
+
 			if (end.x > scr_width)
 			{
 				dir = dirs::stop;
@@ -1092,24 +1116,26 @@ void dll::HERO::set_view_angle()
 
 	float ret = static_cast<float>(atan2(oppos, adj) * 180.0f / 3.14f);
 
-	if (move_ey < move_sy)
+	if (move_sx < move_ex)
 	{
-		if (ver_dir)ret = 0;
-		else if (move_ex > move_sx)ret = 90.0f - ret;
-		else if (move_ex < move_sx)ret = ret + 270.0f;
-	}
-	else if (move_ey > move_sy)
-	{
-		if (ver_dir)ret = 180.0f;
-		else if (move_ex > move_sx)ret = 90.0f + ret;
-		else if (move_ex < move_sx)ret = 180.0f - ret;
+		if (move_ey < move_sy)
+		{
+			if (ver_dir)ret = 0;
+			else ret = ret - 90.0f;
+		}
+		else if (move_ey > move_sy && ver_dir)ret = 180.0f;
 	}
 	else
 	{
-		if (move_sx >= move_ex)ret = 90.0f;
-		else ret = 270.0f;
+		if (move_ey > move_sy)
+		{
+			if (ver_dir)ret = 180.0f;
+			else ret = ret - 90.0f;
+		}
+		else if (move_ey < move_sy && ver_dir)ret = 0.0f;
 	}
-
+	
+	angle = ret;
 }
 
 void dll::HERO::Release()
@@ -1356,7 +1382,7 @@ dll::EVILS::EVILS(evils what, float _sx, float _sy) :PROTON(_sx, _sy)
 		break;
 
 	case evils::ghost:
-		speed = 0.8f;
+		speed = 0.7f;
 		new_dims(80.0f, 96.0f);
 		max_frames = 222;
 		frame_delay = 1;
@@ -1368,7 +1394,7 @@ dll::EVILS::EVILS(evils what, float _sx, float _sy) :PROTON(_sx, _sy)
 		break;
 
 	case evils::soul:
-		speed = 1.0f;
+		speed = 0.8f;
 		new_dims(28.0f, 50.0f);
 		max_frames = 119;
 		frame_delay = 1;
@@ -1378,11 +1404,6 @@ dll::EVILS::EVILS(evils what, float _sx, float _sy) :PROTON(_sx, _sy)
 		attack_delay = 60;
 		view_range = 250.0f;
 		break;
-
-
-
-
-
 	}
 
 	max_frame_delay = frame_delay;
@@ -1835,6 +1856,123 @@ actions dll::EVILS::AIMove(BAG<D2D1_POINT_2F>& AssetsCenters, BAG<D2D1_RECT_F>& 
 		{
 			action = actions::move;
 			set_path(AssetsCenters.front().x, AssetsCenters.front().y);
+		}
+		else if (!ObstBag.empty())
+		{
+			if (Line_box_intersect(ObstBag.front(), slope, intercept))
+			{
+				if (center.x >= ObstBag.front().left && center.x <= ObstBag.front().right)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(center.x, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().right < center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().left - 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+				else if (ObstBag.front().left > center.x)
+				{
+					if (ObstBag.front().bottom < center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().bottom + 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+					else if (ObstBag.front().top > center.y)
+					{
+						obstacle_on_path = true;
+
+						float temp_ex = move_ex;
+						float temp_ey = move_ey;
+
+						set_path(ObstBag.front().right + 50.0f, ObstBag.front().top - _height - 50.0f);
+
+						final_target_x = move_ex;
+						final_target_y = move_ey;
+
+						move_ex = temp_ex;
+						move_ey = temp_ey;
+
+						action = actions::move;
+					}
+				}
+			}
 		}
 		else
 		{
